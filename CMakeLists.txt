@@ -11,11 +11,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   sensor_msgs
+  geometry_msgs
   cv_bridge
   image_transport
+  tf
 )
 
-find_package(OpenCV 3.4.1 REQUIRED)
+find_package(OpenCV 3.4.0 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

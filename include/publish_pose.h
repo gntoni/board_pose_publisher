@@ -2,8 +2,10 @@
 #include "sensor_msgs/CameraInfo.h"
 #include "sensor_msgs/Image.h"
 #include "std_msgs/String.h"
+#include "geometry_msgs/PoseStamped.h"
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+#include <tf/transform_broadcaster.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco/charuco.hpp>
 
@@ -31,11 +33,14 @@ class publish_pose
         cv::Ptr<cv::aruco::Dictionary> dictionary;
 
         float axisLength;
+	std::string frame_name;
 
         cv::Ptr<cv::aruco::CharucoBoard> charucoboard;
         cv::Ptr<cv::aruco::Board> board;
 
     private:
+	geometry_msgs::PoseStamped pose_msg;
+
         ros::Publisher board_pose_pub;
         ros::Publisher board_pose_img_pub;
         ros::Subscriber camera_info_sub;

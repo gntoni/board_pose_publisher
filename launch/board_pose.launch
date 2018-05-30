@@ -1,15 +1,16 @@
 <launch>
   <!-- board parameters -->
-  <arg name="squaresX" default="5" />
-  <arg name="squaresY" default="7" />
-  <arg name="squareLength" default="40" />
-  <arg name="markerLength" default="20" />
+  <arg name="squaresX" default="4" />
+  <arg name="squaresY" default="6" />
+  <arg name="squareLength" default="0.040" />
+  <arg name="markerLength" default="0.025" />
   <arg name="dictionaryId" default="1" />
-  <arg name="showRejected" default="true" />
+  <arg name="showRejected" default="false" />
 
   <!-- topic parameters -->
   <arg name="camera_info_topic" default="camera_info" />
   <arg name="camera_image_topic" default="camera_image" />
+  <arg name="frame_name" default="camera_rgb_optical_frame" />
 
 
   <node pkg="charuco_pose_publisher" type="publish_pose" name="charuco_board_pose" output="screen">
@@ -21,6 +22,8 @@
      <param name="showRejected" type="bool" value="$(arg showRejected)"/>
      <param name="camera_info_topic" type="str" value="$(arg camera_info_topic)"/>
      <param name="camera_image_topic" type="str" value="$(arg camera_image_topic)"/>
+     <param name="frame_name" type="str" value="$(arg frame_name)"/>
+
   </node>
 
 </launch>
