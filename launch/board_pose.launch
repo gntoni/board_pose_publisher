@@ -1,17 +1,21 @@
 <launch>
   <!-- board parameters -->
-  <arg name="squaresX" default="4" />
-  <arg name="squaresY" default="6" />
-  <arg name="squareLength" default="0.040" />
-  <arg name="markerLength" default="0.025" />
+  <arg name="squaresX" default="3" />
+  <arg name="squaresY" default="5" />
+  <arg name="squareLength" default="0.050" />
+  <arg name="markerLength" default="0.040" />
   <arg name="dictionaryId" default="1" />
   <arg name="showRejected" default="false" />
+  <arg name="drawImgPixX" default="540" />
+  <arg name="drawImgPixY" default="900" />
+  <arg name="drawImgMargin" default="10" />
+  <arg name="drawImgBorder" default="1" />
+
 
   <!-- topic parameters -->
-  <arg name="camera_info_topic" default="camera_info" />
-  <arg name="camera_image_topic" default="camera_image" />
+  <arg name="camera_info_topic" default="/camera/rgb/camera_info" />
+  <arg name="camera_image_topic" default="/camera/rgb/image_rect_color" />
   <arg name="frame_name" default="camera_rgb_optical_frame" />
-
 
   <node pkg="charuco_pose_publisher" type="publish_pose" name="charuco_board_pose" output="screen">
      <param name="squaresX" type="int" value="$(arg squaresX)"/>
@@ -20,10 +24,12 @@
      <param name="markerLength" type="double" value="$(arg markerLength)"/>
      <param name="dictionaryId" type="int" value="$(arg dictionaryId)"/>
      <param name="showRejected" type="bool" value="$(arg showRejected)"/>
+     <param name="drawImgPixX" type="int" value="$(arg drawImgPixX)"/>
+     <param name="drawImgPixY" type="int" value="$(arg drawImgPixY)"/>
+     <param name="drawImgMargin" type="int" value="$(arg drawImgMargin)"/>
+     <param name="drawImgBorder" type="int" value="$(arg drawImgBorder)"/>
      <param name="camera_info_topic" type="str" value="$(arg camera_info_topic)"/>
      <param name="camera_image_topic" type="str" value="$(arg camera_image_topic)"/>
      <param name="frame_name" type="str" value="$(arg frame_name)"/>
-
   </node>
-
 </launch>

@@ -22,6 +22,10 @@ publish_pose::publish_pose()
     ros::param::get("charuco_board_pose/dictionaryId", dictionaryId);
     ros::param::get("charuco_board_pose/showRejected", showRejected);
     ros::param::get("charuco_board_pose/refindStrategy", refindStrategy);
+    ros::param::get("charuco_board_pose/drawImgPixX", drawImgPixX);
+    ros::param::get("charuco_board_pose/drawImgPixY", drawImgPixY);
+    ros::param::get("charuco_board_pose/drawImgMargin", drawImgMargin);
+    ros::param::get("charuco_board_pose/drawImgBorder", drawImgBorder);
 
     detectorParams = cv::aruco::DetectorParameters::create(); // ToDo: Load parameters
     dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(dictionaryId));
@@ -34,7 +38,7 @@ publish_pose::publish_pose()
 
     // draw board
     cv::Mat boardImage;
-    charucoboard->draw( cv::Size(480, 720), boardImage, 10, 1 );
+    charucoboard->draw( cv::Size(drawImgPixX, drawImgPixY), boardImage, drawImgMargin, drawImgBorder );
     cv::imwrite("BoardIM.jpg",boardImage);
 
 }
@@ -126,43 +130,42 @@ void publish_pose::imageCallback(const sensor_msgs::ImageConstPtr& msg)
         cv::aruco::drawDetectedCornersCharuco(img_ptr->image, charucoCorners, charucoIds, color);
     }
 
-    if(validPose)
+    if(validPose) {
         cv::aruco::drawAxis(img_ptr->image, CameraMatrix, DistCoeffs, rvec, tvec, axisLength);
 
-    // Publish image
-    board_pose_img_pub.publish(img_ptr->toImageMsg());
-
-    // Publish pose
-    static tf::TransformBroadcaster br;
-    double angle = cv::norm(rvec);
-    rvec = rvec / angle;
-    double s = std::sin(angle/2);
-    double qx = rvec[0]*s;
-    double qy = rvec[1]*s;
-    double qz = rvec[2]*s;
-    double qw = std::cos(angle/2);
-
-    pose_msg.header.frame_id = frame_name;
-    pose_msg.header.stamp = ros::Time::now();
-
-    pose_msg.pose.position.x = tvec[0];
-    pose_msg.pose.position.y = tvec[1];
-    pose_msg.pose.position.z = tvec[2];
-
-    pose_msg.pose.orientation.x = qx;
-    pose_msg.pose.orientation.y = qy;
-    pose_msg.pose.orientation.z = qz;
-    pose_msg.pose.orientation.w = qw;
-
-    board_pose_pub.publish(pose_msg);
-
-
-    tf::Transform board_transform;
-    board_transform.setOrigin( tf::Vector3(tvec[0], tvec[1], tvec[2]) );
-    tf::Quaternion q(qx,qy,qz,qw);
-    //q.setRotation(tf::Vector3(rvec[0], rvec[1], rvec[2]), angle);
-    board_transform.setRotation(q);
-    br.sendTransform(tf::StampedTransform(board_transform, ros::Time::now(), frame_name, "board_frame"));
+        // Publish image
+        board_pose_img_pub.publish(img_ptr->toImageMsg());
+    
+        // Publish pose
+        static tf::TransformBroadcaster br;
+        double angle = cv::norm(rvec);
+        rvec = rvec / angle;
+        double s = std::sin(angle/2);
+        double qx = rvec[0]*s;
+        double qy = rvec[1]*s;
+        double qz = rvec[2]*s;
+        double qw = std::cos(angle/2);
+    
+        pose_msg.header.frame_id = frame_name;
+        pose_msg.header.stamp = ros::Time::now();
+    
+        pose_msg.pose.position.x = tvec[0];
+        pose_msg.pose.position.y = tvec[1];
+        pose_msg.pose.position.z = tvec[2];
+    
+        pose_msg.pose.orientation.x = qx;
+        pose_msg.pose.orientation.y = qy;
+        pose_msg.pose.orientation.z = qz;
+        pose_msg.pose.orientation.w = qw;
+    
+        board_pose_pub.publish(pose_msg);
+        
+        tf::Transform board_transform;
+        board_transform.setOrigin( tf::Vector3(tvec[0], tvec[1], tvec[2]) );
+        tf::Quaternion q(qx,qy,qz,qw);
+        board_transform.setRotation(q);
+        br.sendTransform(tf::StampedTransform(board_transform, ros::Time::now(), frame_name, "board_frame"));
+    }
 }
 
 int main(int argc, char **argv)

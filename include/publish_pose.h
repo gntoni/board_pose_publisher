@@ -28,6 +28,11 @@ class publish_pose
         int dictionaryId;
         bool showRejected;
         bool refindStrategy;
+        int drawImgPixX;
+        int drawImgPixY;
+        int drawImgMargin;
+        int drawImgBorder;
+
 
         cv::Ptr<cv::aruco::DetectorParameters> detectorParams;
         cv::Ptr<cv::aruco::Dictionary> dictionary;

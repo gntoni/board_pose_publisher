@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 
-find_package(OpenCV 3.4.0 REQUIRED)
+find_package(OpenCV 3.1.0 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
