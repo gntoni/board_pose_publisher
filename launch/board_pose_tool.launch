@@ -32,4 +32,6 @@
      <param name="camera_image_topic" type="str" value="$(arg camera_image_topic)"/>
      <param name="frame_name" type="str" value="$(arg frame_name)"/>
   </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="board_tool_tf" args="0.336 0.023 0.0 0.0 0.0 -0.70710  0.70710 board_frame tool_frame 100" />
 </launch>
