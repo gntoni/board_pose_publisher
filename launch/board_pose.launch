@@ -2,8 +2,8 @@
   <!-- board parameters -->
   <arg name="squaresX" default="3" />
   <arg name="squaresY" default="5" />
-  <arg name="squareLength" default="0.053" />
-  <arg name="markerLength" default="0.042" />
+  <arg name="squareLength" default="0.0532" />
+  <arg name="markerLength" default="0.043" />
   <arg name="dictionaryId" default="1" />
   <arg name="showRejected" default="false" />
   <arg name="drawImgPixX" default="540" />
