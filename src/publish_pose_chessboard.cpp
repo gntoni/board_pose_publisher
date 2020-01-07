@@ -7,17 +7,17 @@ publish_pose::publish_pose()
 {
     camParamsReceived = false;
     std::string camera_info_topic, camera_image_topic;
-    ros::param::get("charuco_board_pose/frame_name", frame_name);
-    ros::param::get("charuco_board_pose/camera_info_topic", camera_info_topic);
-    ros::param::get("charuco_board_pose/camera_image_topic", camera_image_topic);
+    ros::param::get("board_pose/frame_name", frame_name);
+    ros::param::get("board_pose/camera_info_topic", camera_info_topic);
+    ros::param::get("board_pose/camera_image_topic", camera_image_topic);
     board_pose_pub = n.advertise<geometry_msgs::PoseStamped>("chessboard_pose", 1000);
     board_pose_img_pub = n.advertise<sensor_msgs::Image>("chessboard_pose_img", 1000);
     camera_sub = n.subscribe(camera_image_topic, 1000, &publish_pose::imageCallback, this);
     camera_info_sub = n.subscribe(camera_info_topic, 1000, &publish_pose::cameraInfoCallback, this);
 
-    ros::param::get("charuco_board_pose/squaresX", squaresX);
-    ros::param::get("charuco_board_pose/squaresY", squaresY);
-    ros::param::get("charuco_board_pose/squareLength", squareLength);
+    ros::param::get("board_pose/squaresX", squaresX);
+    ros::param::get("board_pose/squaresY", squaresY);
+    ros::param::get("board_pose/squareLength", squareLength);
 
     //Generate chessboard 3D points
     for(int i = 0; i < squaresX; ++i)
@@ -71,15 +71,16 @@ void publish_pose::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     image_bgr = img_ptr->image;
     cvtColor ( image_bgr, image_grey, CV_BGR2GRAY, 0 );
-    bool found = cv::findChessboardCorners( image_grey, cv::Size(squaresX,squaresY), image_corners, CV_CALIB_CB_ADAPTIVE_THRESH );
+    //bool found = cv::findChessboardCorners( image_grey, cv::Size(squaresX,squaresY), image_corners, CV_CALIB_CB_ADAPTIVE_THRESH );
+    bool found = cv::findChessboardCorners( image_grey, cv::Size(squaresX,squaresY), image_corners);
 
     if (found)
     {
+        ROS_INFO("FOUND");
         cv::Vec3d rotation_vec;
         cv::Vec3d translation_vec;
 
         solvePnP ( object_corners, image_corners, CameraMatrix, DistCoeffs, rotation_vec, translation_vec );
-
 
         // generate rotation matrix from vector
         extrinsic_matrix = cv::Mat_<double>::eye ( 4,4 );
@@ -87,8 +88,9 @@ void publish_pose::imageCallback(const sensor_msgs::ImageConstPtr& msg)
         extrinsic_matrix ( 1,3 ) = translation_vec ( 1 );
         extrinsic_matrix ( 2,3 ) = translation_vec ( 2 );
         cv::Rodrigues ( rotation_vec, cv::Mat ( extrinsic_matrix, cv::Rect ( 0, 0, 3, 3 ) ), cv::noArray() );
+        
         projection_matrix = CameraMatrix * extrinsic_matrix;
-
+        
         // generate tf model to camera
         tf::Matrix3x3 R ( extrinsic_matrix( 0, 0 ), extrinsic_matrix( 0, 1 ), extrinsic_matrix( 0, 2 ),
                           extrinsic_matrix( 1, 0 ), extrinsic_matrix( 1, 1 ), extrinsic_matrix( 1, 2 ),
@@ -147,7 +149,7 @@ void publish_pose::imageCallback(const sensor_msgs::ImageConstPtr& msg)
         cv::line ( image_bgr, pi0, pi3, CV_RGB ( 0,0,255 ), lineThickness );
 
         drawChessboardCorners ( image_bgr, cv::Size(squaresX,squaresY), cv::Mat ( image_corners ), found );
-        board_pose_img_pub.publish(image_bgr);
+        board_pose_img_pub.publish(img_ptr->toImageMsg());
     }
 
 }
