@@ -32,15 +32,22 @@ publish_pose::~publish_pose()
 void publish_pose::cameraInfoCallback(const sensor_msgs::CameraInfo::ConstPtr& cam_info_msg)
 {
   ROS_INFO("Got camera info");
-  CameraMatrix = (cv::Mat_<double>(3,3) <<  cam_info_msg->K[0], 
+  CameraMatrix = (cv::Mat_<double>(4,4) <<  cam_info_msg->K[0], 
                                             cam_info_msg->K[1],
                                             cam_info_msg->K[2],
+                                            0.f,
                                             cam_info_msg->K[3],
                                             cam_info_msg->K[4],
                                             cam_info_msg->K[5],
+                                            0.f,
                                             cam_info_msg->K[6],
                                             cam_info_msg->K[7],
-                                            cam_info_msg->K[8]);
+                                            cam_info_msg->K[8],
+                                            0.f,
+                                            0.f,
+                                            0.f,
+                                            0.f,
+                                            1.f);
 
   DistCoeffs = (cv::Mat_<double>(1,5) <<    cam_info_msg->D[0], // k1
                                             cam_info_msg->D[1], // k2
@@ -80,7 +87,7 @@ void publish_pose::imageCallback(const sensor_msgs::ImageConstPtr& msg)
         cv::Vec3d rotation_vec;
         cv::Vec3d translation_vec;
 
-        solvePnP ( object_corners, image_corners, CameraMatrix, DistCoeffs, rotation_vec, translation_vec );
+        solvePnP ( object_corners, image_corners,cv::Mat(CameraMatrix,  cv::Rect( 0, 0, 3, 3 )), DistCoeffs, rotation_vec, translation_vec );
 
         // generate rotation matrix from vector
         extrinsic_matrix = cv::Mat_<double>::eye ( 4,4 );
