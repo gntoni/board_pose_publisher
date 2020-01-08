@@ -1,5 +1,6 @@
-# charuco_board_pose_publisher
+# Board Pose Publisher
 This package publishes the pose of a charuco board. Mainly it is used for robot calibration, which is described in the next sections.
+For a version working on opencv 2 with a regular chessboard pattern, check the "cv2" branch.
 
 # Robot-Camera calibration
 
